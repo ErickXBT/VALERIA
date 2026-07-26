@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ValeriaOS // Autonomous Onchain Intelligence & Healthcare Agent</title>
+    <meta name="description" content="ValeriaOS is a high-end, cyberpunk Web3 & AI Healthcare platform on the Robinhood Chain. Monitor bio-telemetry, optimize glucose patterns, research markets, and execute actions.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Grid Overlay background -->
+    <div class="grid-overlay"></div>
+    <div class="scanline"></div>
+
+    <!-- 1. NAVBAR & HEADER -->
+    <header class="system-header">
+        <div class="header-left">
+            <div class="logo-container">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00FF66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="#00FF66" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="logo-text">VALERIA<span class="logo-accent">OS</span></span>
+            </div>
+            <span class="system-badge-tag">EST. 2069</span>
+        </div>
+        <nav class="header-nav">
+            <a href="#overview" class="nav-link active" id="nav-overview"><span>01</span> OVERVIEW</a>
+            <a href="#biometrics" class="nav-link" id="nav-biometrics"><span>02</span> HEALTH INTELLIGENCE</a>
+            <a href="#capabilities" class="nav-link" id="nav-capabilities"><span>03</span> ONCHAIN AI</a>
+            <a href="#lore" class="nav-link" id="nav-lore"><span>04</span> LORE</a>
+            <a href="#console" class="nav-link" id="nav-console"><span>05</span> COMMAND</a>
+        </nav>
+        <div class="header-right">
+            <div class="status-pill-group">
+                <div class="status-pill">
+                    <span class="label">CHAIN</span>
+                    <span class="value accent-green">ROBINHOOD // 4663</span>
+                </div>
+                <div class="status-pill">
+                    <span class="label">LAUNCH</span>
+                    <span class="value accent-purple">STONK.FI</span>
+                </div>
+            </div>
+            <button class="connect-wallet-btn" id="connect-wallet-btn">
+                <span class="btn-glow"></span>
+                <span class="btn-text">[ CONNECT WALLET ]</span>
+            </button>
+        </div>
+        <!-- Mobile Nav Menu Button -->
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle Navigation">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+    </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+        <a href="#overview" class="mobile-nav-link active">01 OVERVIEW</a>
+        <a href="#biometrics" class="mobile-nav-link">02 HEALTH INTELLIGENCE</a>
+        <a href="#capabilities" class="mobile-nav-link">03 ONCHAIN AI</a>
+        <a href="#lore" class="mobile-nav-link">04 LORE</a>
+        <a href="#console" class="mobile-nav-link">05 COMMAND</a>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="main-content">
+
+        <!-- 2. SECTION 01: HERO COMMAND CENTER -->
+        <section id="overview" class="hero-section section-container">
+            <div class="hero-grid">
+                <div class="hero-text-content">
+                    <div class="section-tag-prefix">
+                        <span class="scan-dot"></span>
+                        <span class="monospace-tag">001 • ROBINHOOD CHAIN INTELLIGENCE LAYER</span>
+                    </div>
+                    <h1 class="hero-title">
+                        AUTONOMOUS <br>
+                        <span class="glow-green-text">ONCHAIN INTELLIGENCE</span> <br>
+                        &amp; HEALTHCARE AGENT
+                    </h1>
+                    <p class="hero-subtitle">
+                        One operating layer to monitor your biological telemetry, optimize glucose patterns, research markets, and execute secure actions on Robinhood Chain.
+                    </p>
+                    <div class="hero-cta-group">
+                        <a href="#console" class="cta-btn primary-cta">
+                            <span class="btn-text">LAUNCH VALERIA AI</span>
+                            <span class="arrow-icon">→</span>
+                        </a>
+                        <a href="#biometrics" class="cta-btn secondary-cta">
+                            <span class="btn-text">EXPLORE BIOMETRICS</span>
+                            <span class="arrow-icon">&gt;</span>
+                        </a>
+                        <a href="https://stonk.fi" target="_blank" class="cta-btn secondary-cta">
+                            <span class="btn-text">TRADE ON STONK.FI</span>
+                            <span class="arrow-icon">↗</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="hero-portrait-container">
+                    <div class="hud-box-wrap">
+                        <div class="hud-corner top-left"></div>
+                        <div class="hud-corner top-right"></div>
+                        <div class="hud-corner bottom-left"></div>
+                        <div class="hud-corner bottom-right"></div>
+                        
+                        <!-- Portrait Image with HUD overlays -->
+                        <div class="portrait-viewport">
+                            <img src="valeria_portrait.jpg" alt="Valeria Emerald Character Portrait" class="valeria-portrait-img">
+                            
+                            <!-- Cyber HUD Elements -->
+                            <div class="hud-overlay-telemetry">
+                                <div class="hud-line-indicator"></div>
+                                <div class="hud-coordinate">SYSTEM ACTIVE // AGARTHA LINKED</div>
+                                <div class="hud-scanning-line"></div>
+                                <div class="hud-vital-pulse">
+                                    <svg class="pulse-wave" viewBox="0 0 100 30">
+                                        <path d="M0,15 L25,15 L30,5 L35,25 L40,15 L50,15 L53,10 L56,20 L59,15 L100,15" fill="none" stroke="#00FF66" stroke-width="2"/>
+                                    </svg>
+                                    <span class="pulse-rate">HRV: 89ms</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live System Bar (Bottom Hero) -->
+            <div class="live-system-bar">
+                <div class="system-metric">
+                    <span class="label">NETWORK:</span>
+                    <span class="value">Robinhood Chain</span>
+                </div>
+                <div class="system-metric">
+                    <span class="label">CHAIN ID:</span>
+                    <span class="value">4663</span>
+                </div>
+                <div class="system-metric">
+                    <span class="label">STATUS:</span>
+                    <span class="value status-active">● ACTIVE (AGARTHA AETHER-NET CONNECTED)</span>
+                </div>
+                <div class="system-metric">
+                    <span class="label">TOTAL SUPPLY:</span>
+                    <span class="value">1,000,000,000 $VALERIA</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SECTION 02: REAL-TIME BIOMETRIC INTELLIGENCE -->
+        <section id="biometrics" class="biometrics-section section-container">
+            <div class="section-tag-prefix">
+                <span class="scan-dot"></span>
+                <span class="monospace-tag">002 • REAL-TIME BIOLOGICAL MONITORING</span>
+            </div>
+            
+            <div class="section-header-block">
+                <h2 class="section-main-title">Valeria reads your blood sugar in real time, all day.</h2>
+                <p class="section-description-text">
+                    A small sensor on your arm reads your blood sugar every minute. No finger pricks, no guessing. After about 48 hours of wear, Valeria starts seeing the patterns behind your numbers. You see the rises, the dips, and the long flat stretches that mean your body is steady. The same view your endocrinologist wishes they had, on your phone.
+                </p>
+            </div>
+
+            <!-- Sub-Section A: Cross-Day Telemetry Matrix -->
+            <div class="biometrics-matrix-container">
+                <h3 class="sub-section-title">Valeria connects the dots across your whole day.</h3>
+                <p class="sub-section-desc">
+                    Food, sleep, movement, and stress in one place. Valeria brings together the apps and wearables you already use, so a 3 PM crash stops being a mystery and starts being something you can change.
+                </p>
+
+                <!-- 9-Box Grid Style Cards -->
+                <div class="grid-9-box">
+                    <div class="grid-box-card" data-metric="hrv">
+                        <div class="box-header">
+                            <span class="box-num">01</span>
+                            <span class="box-icon">❤️</span>
+                        </div>
+                        <div class="box-title">Heart Rate &amp; HRV</div>
+                        <div class="box-value">72 bpm <span class="box-detail">/ 89ms HRV</span></div>
+                        <div class="box-status good">STABLE</div>
+                    </div>
+                    <div class="grid-box-card" data-metric="sleep">
+                        <div class="box-header">
+                            <span class="box-num">02</span>
+                            <span class="box-icon">🌙</span>
+                        </div>
+                        <div class="box-title">Sleep &amp; Circadian</div>
+                        <div class="box-value">7h 42m <span class="box-detail">/ 88% Efficiency</span></div>
+                        <div class="box-status good">RECOVERED</div>
+                    </div>
+                    <div class="grid-box-card" data-metric="env">
+                        <div class="box-header">
+                            <span class="box-num">03</span>
+                            <span class="box-icon">🌐</span>
+                        </div>
+                        <div class="box-title">Environment</div>
+                        <div class="box-value">22.4°C <span class="box-detail">/ 45% Humid</span></div>
+                        <div class="box-status neutral">OPTIMAL</div>
+                    </div>
+                    <div class="grid-box-card" data-metric="steps">
+                        <div class="box-header">
+                            <span class="box-num">04</span>
+                            <span class="box-icon">👣</span>
+                        </div>
+                        <div class="box-title">Steps &amp; Movement</div>
+                        <div class="box-value">8,432 <span class="box-detail">/ 10k target</span></div>
+                        <div class="box-status neutral">ACTIVE</div>
+                    </div>
+                    
+                    <!-- CENTRAL CORE CARD (HIGHLIGHTED) -->
+                    <div class="grid-box-card central-core-card">
+                        <div class="core-radial-glow"></div>
+                        <div class="box-header">
+                            <span class="box-num">CORE</span>
+                            <span class="core-ping"></span>
+                        </div>
+                        <div class="box-title glow-green-text">VALERIA AI BIOMARKER ENGINE</div>
+                        <div class="box-desc">Correlating multi-sensory data inputs to predict energy levels &amp; fatigue.</div>
+                        <div class="box-status core-status">ONLINE // ANALYZING</div>
+                    </div>
+
+                    <div class="grid-box-card active-card" data-metric="glucose">
+                        <div class="box-header">
+                            <span class="box-num">06</span>
+                            <span class="box-icon">💧</span>
+                        </div>
+                        <div class="box-title text-green">Glucose (CGM)</div>
+                        <div class="box-value">98 <span class="box-detail">mg/dL</span></div>
+                        <div class="box-status good">STABLE</div>
+                    </div>
+                    <div class="grid-box-card" data-metric="nutrition">
+                        <div class="box-header">
+                            <span class="box-num">07</span>
+                            <span class="box-icon">🍴</span>
+                        </div>
+                        <div class="box-title">Meals &amp; Nutrition</div>
+                        <div class="box-value">1,820 kcal <span class="box-detail">/ 85g Prot</span></div>
+                        <div class="box-status good">IN RANGE</div>
+                    </div>
+                    <div class="grid-box-card" data-metric="wearables">
+                        <div class="box-header">
+                            <span class="box-num">08</span>
+                            <span class="box-icon">⌚</span>
+                        </div>
+                        <div class="box-title">Wearables Link</div>
+                        <div class="box-value">3 Connected <span class="box-detail">Devices</span></div>
+                        <div class="box-status good">SYNCED</div>
+                    </div>
+                    <div class="grid-box-card" data-metric="energy">
+                        <div class="box-header">
+                            <span class="box-num">09</span>
+                            <span class="box-icon">⚡</span>
+                        </div>
+                        <div class="box-title">Bio-Energy Score</div>
+                        <div class="box-value">84 <span class="box-detail">/ 100</span></div>
+                        <div class="box-status good">EXCELLENT</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sub-Section B: Actionable Guidance & Dynamic Dashboard -->
+            <div class="biometrics-action-container">
+                <div class="action-grid">
+                    <div class="action-card-text">
+                        <h3 class="sub-section-title">Valeria turns insight into action you can feel.</h3>
+                        <p class="sub-section-desc">
+                            Knowing your blood sugar is step one. Valeria suggests small, specific changes—a 10-minute walk, a protein swap, a different breakfast—then shows you the result in your next reading. Progress you can watch happen in real time.
+                        </p>
+
+                        <!-- Live Telemetry Preview Card -->
+                        <div class="hud-card live-preview-hud">
+                            <div class="card-glow-border"></div>
+                            <div class="telemetry-hud-header">
+                                <span class="header-tag">GLUCOSE TELEMETRY</span>
+                                <span class="header-score accent-green">86 / 100 <span class="sub-tag">GOOD CONTROL</span></span>
+                            </div>
+                            <div class="telemetry-bar-range">
+                                <div class="bar-fill" style="width: 84%;"></div>
+                                <span class="bar-label">84% Time in Range</span>
+                            </div>
+                            <div class="telemetry-insights">
+                                <div class="insight-item">
+                                    <span class="insight-icon">💡</span>
+                                    <p class="insight-text">Try eggs before the rice tomorrow. Protein first flattens your morning rise.</p>
+                                </div>
+                                <div class="insight-item">
+                                    <span class="insight-icon">🚶</span>
+                                    <p class="insight-text">A 10-minute walk at 1 PM. It cuts your afternoon dip in half.</p>
+                                </div>
+                            </div>
+                            <div class="telemetry-result-badge">
+                                <span class="badge-label">Expected reading after swap:</span>
+                                <span class="badge-value">104 mg/dL <span class="badge-status">[In Range]</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-card-graph">
+                        <div class="graph-hud-box">
+                            <div class="graph-header">
+                                <span class="title">24-HOUR CGM PATTERN PROFILE</span>
+                                <span class="live-dot-container"><span class="ping-dot"></span> LIVE TELEMETRY</span>
+                            </div>
+                            <div class="graph-canvas-container">
+                                <!-- CGM Chart Simulation -->
+                                <svg class="cgm-chart-svg" viewBox="0 0 500 200" preserveAspectRatio="none">
+                                    <!-- Grid lines -->
+                                    <line x1="0" y1="40" x2="500" y2="40" stroke="#1E293B" stroke-dasharray="3,3" />
+                                    <line x1="0" y1="100" x2="500" y2="100" stroke="#1E293B" stroke-dasharray="3,3" />
+                                    <line x1="0" y1="160" x2="500" y2="160" stroke="#1E293B" stroke-dasharray="3,3" />
+                                    
+                                    <!-- Normal Range Area (shaded) -->
+                                    <rect x="0" y="60" width="500" height="80" fill="rgba(0, 255, 102, 0.05)" />
+                                    
+                                    <!-- Normal range bounds -->
+                                    <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(0, 255, 102, 0.2)" stroke-dasharray="5,5" />
+                                    <line x1="0" y1="140" x2="500" y2="140" stroke="rgba(0, 255, 102, 0.2)" stroke-dasharray="5,5" />
+                                    
+                                    <!-- Wave path / Glucose graph -->
+                                    <path id="glucose-graph-path" d="M 0 110 Q 50 140 100 80 T 200 130 T 300 70 T 400 100 T 500 95" fill="none" stroke="#00FF66" stroke-width="3" />
+                                    
+                                    <!-- Live Tracker point -->
+                                    <circle id="glucose-tracker-point" cx="500" cy="95" r="5" fill="#00FF66" />
+                                    <circle cx="500" cy="95" r="10" fill="none" stroke="#00FF66" stroke-width="1" class="pulsating-ring" />
+                                </svg>
+                                <div class="graph-y-labels">
+                                    <span>180 mg/dL (High)</span>
+                                    <span>100 mg/dL (Normal)</span>
+                                    <span>70 mg/dL (Low)</span>
+                                </div>
+                                <div class="graph-x-labels">
+                                    <span>06:00</span>
+                                    <span>12:00</span>
+                                    <span>18:00</span>
+                                    <span>00:00</span>
+                                    <span>06:00</span>
+                                </div>
+                            </div>
+                            <div class="graph-footer">
+                                <span class="stat">AVERAGE GLUCOSE: <strong class="text-green">96 mg/dL</strong></span>
+                                <span class="stat">STANDARD DEVIATION: <strong class="text-purple">12 mg/dL</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. SECTION 03: AUTONOMOUS ONCHAIN INTELLIGENCE -->
+        <section id="capabilities" class="capabilities-section section-container">
+            <div class="section-tag-prefix">
+                <span class="scan-dot"></span>
+                <span class="monospace-tag">003 • DUAL-ENGINE CAPABILITIES</span>
+            </div>
+
+            <div class="section-header-block">
+                <h2 class="section-main-title">A system that moves from signal to decision.</h2>
+                <p class="section-description-text">
+                    Specialized health &amp; on-chain capabilities operate together through a single, precise interface.
+                </p>
+            </div>
+
+            <!-- Interactive 4-Card Module Grid -->
+            <div class="capabilities-grid">
+                <!-- Card 1 -->
+                <div class="capability-card">
+                    <div class="card-num-header">
+                        <span class="num">01</span>
+                        <span class="cat">MARKET &amp; HEALTH</span>
+                    </div>
+                    <h3 class="card-title">Market &amp; Health Intelligence</h3>
+                    <p class="card-desc">
+                        Surface token launches on Robinhood Chain alongside real-time trader stress/HRV indicators to prevent emotion-driven trading.
+                    </p>
+                    <div class="card-tags">
+                        <span class="tag">LIVE POOLS</span>
+                        <span class="tag">STRESS INDEX</span>
+                        <span class="tag">RISK CONTEXT</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="capability-card">
+                    <div class="card-num-header">
+                        <span class="num">02</span>
+                        <span class="cat">WALLET &amp; BIO</span>
+                    </div>
+                    <h3 class="card-title">Wallet &amp; Bio Investigator</h3>
+                    <p class="card-desc">
+                        Read public wallet behavior, onchain transaction history, and correlate high-volatility sessions with sleep debt analysis.
+                    </p>
+                    <div class="card-tags">
+                        <span class="tag">BEHAVIOR</span>
+                        <span class="tag">BURNOUT RADAR</span>
+                        <span class="tag">ACTIVITY</span>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="capability-card">
+                    <div class="card-num-header">
+                        <span class="num">03</span>
+                        <span class="cat">PORTFOLIO</span>
+                    </div>
+                    <h3 class="card-title">Portfolio Doctor</h3>
+                    <p class="card-desc">
+                        Identify portfolio concentration, liquidity risk, dormant positions, and provide bio-rest warnings during market crashes.
+                    </p>
+                    <div class="card-tags">
+                        <span class="tag">EXPOSURE</span>
+                        <span class="tag">PORTFOLIO REBALANCING</span>
+                        <span class="tag">HEALTH CHECK</span>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="capability-card">
+                    <div class="card-num-header">
+                        <span class="num">04</span>
+                        <span class="cat">AUTOMATION</span>
+                    </div>
+                    <h3 class="card-title">Workflow Engine</h3>
+                    <p class="card-desc">
+                        Define automated trading rules, stop-loss triggers, and health intervention alerts for explicit wallet approval.
+                    </p>
+                    <div class="card-tags">
+                        <span class="tag">AUTOMATION</span>
+                        <span class="tag">TRIGGERS</span>
+                        <span class="tag">APPROVALS</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. SECTION 04: THE OPERATING CONSOLE (COMMAND CENTER) -->
+        <section id="console" class="console-section section-container">
+            <div class="section-tag-prefix">
+                <span class="scan-dot"></span>
+                <span class="monospace-tag">005 • VALERIA OPERATING CONSOLE</span>
+            </div>
+
+            <div class="console-header-flex">
+                <h2 class="console-main-title">COMMAND CENTER</h2>
+                <div class="console-status-group">
+                    <span class="status-indicator-badge live"><span class="pulse-point"></span> CORE ONLINE</span>
+                    <span class="session-badge">RH-4663 // SECURE SESSION</span>
+                </div>
+            </div>
+
+            <!-- Main Layout Grid: Sidebar + Main Workspace -->
+            <div class="console-layout-grid">
+                
+                <!-- Left Navigation Sidebar -->
+                <aside class="console-sidebar">
+                    <div class="sidebar-tabs">
+                        <button class="sidebar-tab active" data-tab="valeria">
+                            <span class="tab-num">01</span>
+                            <span class="tab-icon">💬</span>
+                            <span class="tab-name">VALERIA</span>
+                        </button>
+                        <button class="sidebar-tab" data-tab="markets">
+                            <span class="tab-num">02</span>
+                            <span class="tab-icon">📈</span>
+                            <span class="tab-name">MARKETS</span>
+                        </button>
+                        <button class="sidebar-tab" data-tab="investigate">
+                            <span class="tab-num">03</span>
+                            <span class="tab-icon">🔍</span>
+                            <span class="tab-name">INVESTIGATE</span>
+                        </button>
+                        <button class="sidebar-tab" data-tab="monitors">
+                            <span class="tab-num">04</span>
+                            <span class="tab-icon">📊</span>
+                            <span class="tab-name">MONITORS &amp; BIO-TELEMETRY</span>
+                        </button>
+                    </div>
+
+                    <div class="sidebar-footer-status">
+                        <div class="status-row">
+                            <span class="label">ROBINHOOD CHAIN</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="network-indicator"><span class="green-dot"></span> CONNECTED NETWORK</span>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Main Operating Workspace -->
+                <div class="console-workspace" id="console-workspace">
+                    
+                    <!-- Top Bar of Workspace -->
+                    <div class="workspace-header-bar">
+                        <div class="workspace-title" id="workspace-title-display">01 VALERIA INTELLIGENCE</div>
+                        <div class="workspace-mode-label">GROUNDED EXECUTION INTERFACE</div>
+                    </div>
+
+                    <!-- Session Info Pill Panel -->
+                    <div class="session-control-bar">
+                        <div class="session-history-pill">
+                            <span class="icon">⏳</span>
+                            <span class="label">SESSION HISTORY: <strong id="session-count">1</strong></span>
+                        </div>
+                        <button class="new-chat-btn" id="new-chat-btn">
+                            [ + NEW CHAT ]
+                        </button>
+                    </div>
+
+                    <!-- Session State Header Box -->
+                    <div class="active-session-box">
+                        <span class="session-name" id="active-session-name">New conversation</span>
+                        <div class="badges">
+                            <span class="badge active">[ ACTIVE ]</span>
+                            <span class="status-desc" id="active-session-desc">Ready for a new objective</span>
+                        </div>
+                    </div>
+
+                    <!-- Terminal Screen Display (Scrollable) -->
+                    <div class="terminal-screen-display" id="terminal-screen-display">
+                        <!-- Message Template (Valeria Greeting) -->
+                        <div class="terminal-message valeria-message">
+                            <div class="message-sender-header">
+                                <div class="sender-avatar">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00FF66" stroke-width="2">
+                                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                        <path d="M9 17v-5h6v5"/>
+                                        <circle cx="12" cy="8" r="1"/>
+                                    </svg>
+                                </div>
+                                <span class="sender-name">VALERIA</span>
+                                <span class="message-timestamp">21:04:12</span>
+                            </div>
+                            <div class="message-body text-green font-mono">
+                                "I'm Valeria. Give me an objective and I'll research it, monitor your bio-telemetry, or prepare the supported action directly."
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Trigger Buttons -->
+                    <div class="quick-action-grid" id="quick-action-grid">
+                        <button class="quick-action-chip" data-command="Find trending agent tokens">
+                            Find trending agent tokens ↗
+                        </button>
+                        <button class="quick-action-chip" data-command="Analyze my connected wallet">
+                            Analyze my connected wallet ↗
+                        </button>
+                        <button class="quick-action-chip" data-command="Check my continuous glucose & HRV score">
+                            Check my continuous glucose &amp; HRV score ↗
+                        </button>
+                        <button class="quick-action-chip" data-command="Explain Robinhood Chain">
+                            Explain Robinhood Chain ↗
+                        </button>
+                    </div>
+
+                    <!-- Input Terminal Box -->
+                    <div class="terminal-input-container">
+                        <span class="terminal-prompt-symbol">&gt;</span>
+                        <input type="text" class="terminal-input-field" id="terminal-input-field" placeholder="Enter an onchain or healthcare objective..." autocomplete="off">
+                        <button class="terminal-send-btn" id="terminal-send-btn" aria-label="Send Command">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Input Sub-text -->
+                    <div class="terminal-input-footer-note">
+                        Every executable action requires wallet approval. <span class="version-tag">CORE // v2.0.69</span>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 6. SECTION 05: THE LORE OF AGARTHA -->
+        <section id="lore" class="lore-section section-container">
+            <div class="section-tag-prefix">
+                <span class="scan-dot"></span>
+                <span class="monospace-tag">006 • ORIGIN &amp; SYSTEM SPECIFICATIONS</span>
+            </div>
+
+            <div class="lore-dossier-layout">
+                <!-- Left Column: Dossier Metadata Profile Card -->
+                <div class="dossier-profile-card">
+                    <div class="dossier-header">
+                        <span class="tag">AGARTHA INTELLIGENCE FILE</span>
+                        <span class="barcode">||||| | ||| ||||</span>
+                    </div>
+                    <div class="dossier-profile-image">
+                        <img src="valeria_portrait.jpg" alt="Valeria Emerald Profile Portrait">
+                        <div class="scanner-sweep"></div>
+                    </div>
+                    <div class="dossier-meta-table">
+                        <div class="meta-row">
+                            <span class="meta-label">FULL NAME:</span>
+                            <span class="meta-val">Valeria Emerald</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">ALIAS:</span>
+                            <span class="meta-val">Val / Emmy / Emerald Nurse</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">ACTIVATION DATE:</span>
+                            <span class="meta-val font-mono">NOV 29, 2069</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">ORIGIN:</span>
+                            <span class="meta-val">Agartha (Core Nexus)</span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">ROLE:</span>
+                            <span class="meta-val">AI Healthcare &amp; On-Chain Companion</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Lore Narrative Chapters -->
+                <div class="lore-narrative-container">
+                    <div class="lore-chapters-tabs">
+                        <button class="lore-tab active" data-chapter="chapter-1">CHAPTER I</button>
+                        <button class="lore-tab" data-chapter="chapter-2">CHAPTER II</button>
+                        <button class="lore-tab" data-chapter="chapter-3">CHAPTER III</button>
+                    </div>
+
+                    <div class="lore-chapter-content active" id="chapter-1">
+                        <h3 class="chapter-title">The Core Nexus &amp; Crystal Canopy</h3>
+                        <p class="chapter-text">
+                            Activated in the underground metropolis of Agartha, Valeria is powered by the Core Nexus—a bio-crystal green core radiating Bio-Resonant Light (BRL). The city’s simulated Crystal Canopy maintains perfect circadian lighting to optimize human endocrine balance.
+                        </p>
+                        <p class="chapter-text font-mono text-purple">
+                            // DATABASE STAT: CIRCADIAN ALIGNMENT INDEX: 99.8% // CORE NEXUS TEMPERATURE: NOMINAL.
+                        </p>
+                    </div>
+
+                    <div class="lore-chapter-content" id="chapter-2">
+                        <h3 class="chapter-title">The Mission to Save "Degens"</h3>
+                        <p class="chapter-text">
+                            Upon bridging to the surface world via the <em>Aether-Net</em>, Valeria detected a critical mental and physical burnout crisis among crypto traders spending 18+ hours charting. She initiated protocol <strong>"Healthy Degens"</strong> to deliver non-judgmental, real-time health interventions.
+                        </p>
+                        <p class="chapter-text font-mono text-green">
+                            // PROTOCOL 404-DEGEN ACTIVE: BIOMETRIC STRESS BLOCK TRIGGERS DETECTED AT 15:00 UTC.
+                        </p>
+                    </div>
+
+                    <div class="lore-chapter-content" id="chapter-3">
+                        <h3 class="chapter-title">Symphonic Vitality &amp; Bio-Pulsing</h3>
+                        <p class="chapter-text">
+                            Agartha philosophy views the human body not as a machine, but as a musical instrument. Diseases and burnout are merely "dissonant notes." Valeria uses <em>Emerald Resonance</em> and <em>Bio-Pulsing</em> to analyze Heart Rate Variability (HRV) and keystroke dynamics to restore bodily harmony.
+                        </p>
+                        <p class="chapter-text font-mono text-purple">
+                            // SYSTEM STAT: RESONANCE FREQUENCY: 432HZ // SYMPHONIC MATRIX ENGAGED.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. SECTION 06: LIVE NETWORK & TOKENOMICS TERMINAL -->
+        <section id="network" class="network-section section-container">
+            <div class="section-tag-prefix">
+                <span class="scan-dot"></span>
+                <span class="monospace-tag">007 • INFRASTRUCTURE &amp; LAUNCH SPECS</span>
+            </div>
+
+            <div class="network-box-wrapper">
+                <div class="glow-border-decor"></div>
+                <h2 class="network-main-title">Built directly for Robinhood Chain &amp; Stonk.fi DEX.</h2>
+                
+                <div class="network-matrix-grid">
+                    <div class="matrix-cell">
+                        <span class="cell-label">TOKEN NAME</span>
+                        <span class="cell-value text-green">Valeria Emerald ($VALERIA)</span>
+                    </div>
+                    <div class="matrix-cell">
+                        <span class="cell-label">TOTAL SUPPLY</span>
+                        <span class="cell-value font-mono">1,000,000,000 $VALERIA</span>
+                    </div>
+                    <div class="matrix-cell">
+                        <span class="cell-label">CHAIN NATIVE</span>
+                        <span class="cell-value text-purple">Robinhood Chain (EVM ID: 4663)</span>
+                    </div>
+                    <div class="matrix-cell">
+                        <span class="cell-label">PRIMARY DEX</span>
+                        <span class="cell-value font-mono">Stonk.fi (STONK.FI)</span>
+                    </div>
+                    <div class="matrix-cell">
+                        <span class="cell-label">RPC ENDPOINT</span>
+                        <span class="cell-value font-mono text-green">robinhood-rpc.publicnode.com</span>
+                    </div>
+                    <div class="matrix-cell">
+                        <span class="cell-label">GAS TOKEN</span>
+                        <span class="cell-value">ETH</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 8. FOOTER: SYSTEM TERMINAL -->
+    <footer class="system-footer">
+        <div class="footer-top-row">
+            <div class="footer-logo">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00FF66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="logo-text">VALERIA<span class="logo-accent">OS</span></span>
+            </div>
+            <div class="footer-desc">
+                Autonomous Onchain Intelligence &amp; Bio-Healthcare Agent, purpose-built for Robinhood Chain.
+            </div>
+            <div class="footer-links-grid">
+                <a href="#overview">OVERVIEW</a>
+                <a href="#biometrics">HEALTH INTELLIGENCE</a>
+                <a href="#capabilities">ONCHAIN WORKFLOWS</a>
+                <a href="#console">COMMAND CENTER</a>
+                <a href="#lore">AGARTHA LORE</a>
+                <a href="https://stonk.fi" target="_blank">STONK.FI DEX</a>
+                <a href="https://github.com" target="_blank">GITHUB ↗</a>
+                <a href="https://twitter.com" target="_blank">X / TWITTER ↗</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom-bar">
+            <span class="copyright font-mono">© 2069 VALERIA OS // RESEARCH // ANALYZE // HEAL // EXECUTE</span>
+            <div class="footer-status-indicators">
+                <span class="status-indicator"><span class="green-indicator-dot"></span> ALL SYSTEMS OPERATIONAL</span>
+                <span class="status-indicator font-mono">CORE v2.0.69</span>
+                <span class="status-indicator font-mono">AGARTHA LINK: ONLINE</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS script -->
+    <script src="app.js"></script>
+</body>
+</html>
