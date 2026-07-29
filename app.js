@@ -66,47 +66,183 @@ function initNavigation() {
 }
 
 /* ==========================================================================
-   2. WALLET CONNECTION
+   2. WALLET CONNECTION — Real popup with injected wallet support
    ========================================================================== */
+let _walletConnected = false;
+let _connectedAddress = null;
+let _connectedWalletName = null;
+
 function initWalletConnection() {
     const connectBtn = document.getElementById("connect-wallet-btn");
+    const overlay    = document.getElementById("wallet-modal-overlay");
+    const closeBtn   = document.getElementById("wallet-modal-close");
     const networkStatus = document.querySelector(".network-indicator");
-    let isConnected = false;
 
-    if (connectBtn) {
-        connectBtn.addEventListener("click", () => {
-            if (!isConnected) {
-                // Simulate connecting
-                connectBtn.innerHTML = '<span class="btn-text">CONNECTING...</span>';
-                connectBtn.disabled = true;
+    if (!connectBtn) return;
 
-                setTimeout(() => {
-                    isConnected = true;
-                    connectBtn.disabled = false;
-                    connectBtn.classList.add("connected");
-                    connectBtn.innerHTML = '<span class="btn-glow"></span><span class="btn-text">[ 0x4663...39FF ]</span>';
-                    
-                    if (networkStatus) {
-                        networkStatus.innerHTML = '<span class="green-dot" style="background-color: #00FF66; box-shadow: 0 0 8px #00FF66;"></span> CONNECTED: 0x4663...39FF';
-                    }
+    // Open modal or disconnect
+    connectBtn.addEventListener("click", () => {
+        if (_walletConnected) {
+            disconnectWallet(connectBtn, networkStatus);
+        } else {
+            openWalletModal();
+        }
+    });
 
-                    // Print system alert in terminal
-                    addSystemTerminalMessage("System notification", "WALLET SECURELY CONNECTED. ADDRESS: 0x46634cde71b12b591b7be1d10200ff6639ffa0ff. AUTONOMOUS ONCHAIN WORKFLOW ENGINE ENHANCED.");
-                }, 1000);
-            } else {
-                // Disconnect
-                isConnected = false;
-                connectBtn.classList.remove("connected");
-                connectBtn.innerHTML = '<span class="btn-glow"></span><span class="btn-text">[ CONNECT WALLET ]</span>';
-                
-                if (networkStatus) {
-                    networkStatus.innerHTML = '<span class="green-dot" style="background-color: #9CA3AF; box-shadow: none;"></span> CONNECTED NETWORK';
-                }
-
-                addSystemTerminalMessage("System notification", "WALLET DISCONNECTED. ONCHAIN EXECUTION ENGINES STANDBY.");
-            }
+    // Close modal on overlay click or X
+    if (overlay) {
+        overlay.addEventListener("click", (e) => {
+            if (e.target === overlay) closeWalletModal();
         });
     }
+    if (closeBtn) closeBtn.addEventListener("click", closeWalletModal);
+
+    // Wallet option clicks
+    document.querySelectorAll(".wallet-option").forEach(btn => {
+        btn.addEventListener("click", () => {
+            const wallet = btn.getAttribute("data-wallet");
+            handleWalletConnect(wallet, connectBtn, networkStatus);
+        });
+    });
+}
+
+function openWalletModal() {
+    const overlay = document.getElementById("wallet-modal-overlay");
+    const connecting = document.getElementById("wallet-connecting-state");
+    if (!overlay) return;
+    if (connecting) connecting.style.display = "none";
+    overlay.classList.add("active");
+    document.body.style.overflow = "hidden";
+}
+
+function closeWalletModal() {
+    const overlay = document.getElementById("wallet-modal-overlay");
+    if (overlay) overlay.classList.remove("active");
+    document.body.style.overflow = "";
+}
+
+async function handleWalletConnect(walletType, connectBtn, networkStatus) {
+    const connectingState = document.getElementById("wallet-connecting-state");
+    const connectingText  = document.getElementById("wallet-connecting-text");
+    const optionsGrid     = document.querySelector(".wallet-options-grid");
+
+    const walletNames = {
+        metamask: "MetaMask", phantom: "Phantom",
+        coinbase: "Coinbase Wallet", trust: "Trust Wallet",
+        walletconnect: "WalletConnect", okx: "OKX Wallet"
+    };
+    const name = walletNames[walletType] || walletType;
+
+    // Show connecting state
+    if (optionsGrid) optionsGrid.style.display = "none";
+    if (connectingState) connectingState.style.display = "flex";
+    if (connectingText) connectingText.textContent = `Connecting to ${name}...`;
+
+    try {
+        let address = null;
+
+        if (walletType === "metamask" || walletType === "coinbase") {
+            // Try injected ethereum provider (MetaMask / Coinbase)
+            if (window.ethereum) {
+                const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+                address = accounts[0];
+            } else {
+                // Not installed — open install page
+                window.open(
+                    walletType === "metamask"
+                        ? "https://metamask.io/download/"
+                        : "https://www.coinbase.com/wallet/downloads",
+                    "_blank"
+                );
+                resetModalToGrid(optionsGrid, connectingState);
+                return;
+            }
+        } else if (walletType === "phantom") {
+            // Phantom EVM or Solana
+            const provider = window.phantom?.ethereum || window.phantom?.solana;
+            if (provider) {
+                if (window.phantom?.ethereum) {
+                    const accounts = await window.phantom.ethereum.request({ method: "eth_requestAccounts" });
+                    address = accounts[0];
+                } else {
+                    const resp = await window.phantom.solana.connect();
+                    address = resp.publicKey.toString();
+                }
+            } else {
+                window.open("https://phantom.app/download", "_blank");
+                resetModalToGrid(optionsGrid, connectingState);
+                return;
+            }
+        } else if (walletType === "okx") {
+            if (window.okxwallet) {
+                const accounts = await window.okxwallet.request({ method: "eth_requestAccounts" });
+                address = accounts[0];
+            } else {
+                window.open("https://www.okx.com/web3", "_blank");
+                resetModalToGrid(optionsGrid, connectingState);
+                return;
+            }
+        } else {
+            // trust / walletconnect — no injected provider available in browser
+            // Show friendly message
+            if (connectingText) connectingText.textContent = `${name} — open your ${name} app and scan QR code`;
+            setTimeout(() => {
+                resetModalToGrid(optionsGrid, connectingState);
+            }, 2500);
+            return;
+        }
+
+        // Success
+        if (address) {
+            onWalletConnected(address, name, connectBtn, networkStatus);
+            closeWalletModal();
+        }
+
+    } catch (err) {
+        // User rejected or error
+        if (connectingText) connectingText.textContent = `Connection rejected. Try again.`;
+        setTimeout(() => {
+            resetModalToGrid(optionsGrid, connectingState);
+        }, 2000);
+    }
+}
+
+function resetModalToGrid(optionsGrid, connectingState) {
+    if (optionsGrid) optionsGrid.style.display = "grid";
+    if (connectingState) connectingState.style.display = "none";
+}
+
+function onWalletConnected(address, walletName, connectBtn, networkStatus) {
+    _walletConnected = true;
+    _connectedAddress = address;
+    _connectedWalletName = walletName;
+
+    const short = address.slice(0, 6) + "..." + address.slice(-4);
+
+    if (connectBtn) {
+        connectBtn.classList.add("connected");
+        connectBtn.innerHTML = `<span class="btn-glow"></span><span class="btn-text">[ ${short} ]</span>`;
+    }
+    if (networkStatus) {
+        networkStatus.innerHTML = `<span class="green-dot" style="background-color:#00FF66;box-shadow:0 0 8px #00FF66;"></span> CONNECTED: ${short}`;
+    }
+
+    addSystemTerminalMessage("Wallet", `${walletName.toUpperCase()} CONNECTED. ADDRESS: ${address}. AUTONOMOUS ONCHAIN WORKFLOW ENGINE ACTIVE.`);
+}
+
+function disconnectWallet(connectBtn, networkStatus) {
+    _walletConnected = false;
+    _connectedAddress = null;
+    _connectedWalletName = null;
+
+    if (connectBtn) {
+        connectBtn.classList.remove("connected");
+        connectBtn.innerHTML = '<span class="btn-glow"></span><span class="btn-text">[ CONNECT WALLET ]</span>';
+    }
+    if (networkStatus) {
+        networkStatus.innerHTML = '<span class="green-dot" style="background-color:#9CA3AF;box-shadow:none;"></span> CONNECTED NETWORK';
+    }
+    addSystemTerminalMessage("Wallet", "WALLET DISCONNECTED. ONCHAIN EXECUTION ENGINES STANDBY.");
 }
 
 /* ==========================================================================
@@ -411,20 +547,31 @@ function initCommandCenter() {
                     <span class="text-green">WALLET SEARCH INTERFACE // GROUNDED CORE</span>
                 </div>
                 <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:1rem;">
-                    Enter any public EVM wallet address to investigate transaction intervals and correlate volatility sessions with biometric sleep debt estimations.
+                    Enter any public EVM wallet address to investigate transaction history, token holdings, and onchain activity patterns.
                 </p>
                 <div style="display:flex; gap:0.5rem; margin-bottom:1.5rem;">
                     <span style="color:var(--accent-green); align-self:center;">&gt;</span>
-                    <input type="text" placeholder="Enter EVM wallet address (0x...)" style="background:var(--bg-dark); border:1px solid var(--border-color); color:var(--text-primary); font-family:var(--font-mono); font-size:0.85rem; padding:0.6rem; flex-grow:1; outline:none;">
-                    <button class="cta-btn primary-cta" style="padding:0.6rem 1.2rem; font-size:0.8rem; font-family:var(--font-mono);">ANALYZE</button>
+                    <input type="text" id="wallet-search-input" placeholder="Enter EVM wallet address (0x...)" style="background:var(--bg-dark); border:1px solid var(--border-color); color:var(--text-primary); font-family:var(--font-mono); font-size:0.85rem; padding:0.6rem; flex-grow:1; outline:none;" autocomplete="off" spellcheck="false">
+                    <button id="wallet-analyze-btn" class="cta-btn primary-cta" style="padding:0.6rem 1.2rem; font-size:0.8rem; font-family:var(--font-mono);">ANALYZE</button>
                 </div>
-                <div style="border:1px solid var(--border-color); padding:1.25rem; background:rgba(0,0,0,0.1); border-radius:3px;">
-                    <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.5rem;">INVESTIGATOR RESULT PREVIEW</span>
+                <div id="wallet-result-box" style="border:1px solid var(--border-color); padding:1.25rem; background:rgba(0,0,0,0.1); border-radius:3px; min-height:80px;">
+                    <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.5rem; letter-spacing:0.08em;">INVESTIGATOR RESULT PREVIEW</span>
                     <div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding:1.5rem 0;">
                         No address searched. Enter a target wallet address to initialize correlation protocols.
                     </div>
                 </div>
             `;
+
+            // Wire up analyze button + enter key
+            const analyzeBtn   = viewDiv.querySelector("#wallet-analyze-btn");
+            const searchInput  = viewDiv.querySelector("#wallet-search-input");
+            const runAnalysis  = () => runWalletAnalysis(searchInput.value.trim());
+
+            analyzeBtn.addEventListener("click", runAnalysis);
+            searchInput.addEventListener("keydown", e => { if (e.key === "Enter") runAnalysis(); });
+
+            // Auto-fill connected wallet if available
+            if (_connectedAddress) searchInput.value = _connectedAddress;
         } 
         else if (tabId === "monitors") {
             displayTitle.innerText = "04 MULTI-TELEMETRY BIOMETRIC GAUGES";
@@ -775,6 +922,154 @@ function initLoreDossier() {
             });
         });
     });
+}
+
+/* ==========================================================================
+   WALLET INVESTIGATOR — Real onchain data via Ethplorer free API
+   ========================================================================== */
+async function runWalletAnalysis(address) {
+    const resultBox = document.getElementById("wallet-result-box");
+    if (!resultBox) return;
+
+    // Validate EVM address format
+    if (!address || !/^0x[0-9a-fA-F]{40}$/.test(address)) {
+        resultBox.innerHTML = `
+            <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.5rem; letter-spacing:0.08em;">INVESTIGATOR RESULT PREVIEW</span>
+            <div style="color:orange; font-family:var(--font-mono); font-size:0.82rem; padding:0.5rem 0;">
+                ⚠ Invalid address format. Enter a valid EVM address starting with 0x (40 hex chars).
+            </div>`;
+        return;
+    }
+
+    // Show loading
+    resultBox.innerHTML = `
+        <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.75rem; letter-spacing:0.08em;">INVESTIGATOR RESULT PREVIEW</span>
+        <div style="display:flex; align-items:center; gap:0.75rem; color:var(--accent-green); font-family:var(--font-mono); font-size:0.8rem; padding:0.5rem 0;">
+            <span style="animation:spin 1s linear infinite; display:inline-block;">⟳</span>
+            Fetching onchain data for ${address.slice(0,6)}...${address.slice(-4)}
+        </div>`;
+
+    try {
+        // Ethplorer free API — no key needed beyond "freekey"
+        const url = `https://api.ethplorer.io/getAddressInfo/${address}?apiKey=freekey`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+
+        if (data.error) {
+            resultBox.innerHTML = renderWalletError(data.error.message || "Address not found on Ethereum mainnet.");
+            return;
+        }
+
+        const eth = data.address?.ETH || {};
+        const ethBalance = eth.balance ? parseFloat(eth.balance).toFixed(4) : "0.0000";
+        const ethUsd = eth.price?.rate ? `$${(parseFloat(eth.balance || 0) * eth.price.rate).toFixed(2)}` : "—";
+        const txCount = data.countTxs || data.address?.transactions || 0;
+        const tokenCount = data.tokens?.length || 0;
+        const isContract = data.address?.isContract ? "YES — Smart Contract" : "NO — EOA";
+
+        // Build token list (top 5)
+        let tokenRows = "";
+        if (data.tokens && data.tokens.length > 0) {
+            data.tokens.slice(0, 5).forEach(t => {
+                const bal = t.balance ? (parseFloat(t.balance) / Math.pow(10, t.tokenInfo?.decimals || 18)).toFixed(4) : "—";
+                const usd = t.tokenInfo?.price?.rate
+                    ? `$${(parseFloat(bal) * t.tokenInfo.price.rate).toFixed(2)}`
+                    : "—";
+                tokenRows += `
+                    <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+                        <td style="padding:0.3rem 0.4rem; color:var(--accent-green);">$${t.tokenInfo?.symbol || "?"}</td>
+                        <td style="padding:0.3rem 0.4rem;">${t.tokenInfo?.name?.slice(0,18) || "—"}</td>
+                        <td style="padding:0.3rem 0.4rem;">${parseFloat(bal).toLocaleString()}</td>
+                        <td style="padding:0.3rem 0.4rem; color:var(--accent-green);">${usd}</td>
+                    </tr>`;
+            });
+        } else {
+            tokenRows = `<tr><td colspan="4" style="padding:0.5rem; color:var(--text-muted); text-align:center;">No ERC-20 token holdings found</td></tr>`;
+        }
+
+        // Activity analysis
+        const activityLevel = txCount > 500 ? "HEAVY TRADER" : txCount > 100 ? "ACTIVE" : txCount > 20 ? "MODERATE" : "LIGHT";
+        const riskScore = Math.min(100, Math.round((txCount / 10) + (tokenCount * 2)));
+        const biometricNote = txCount > 200
+            ? "High onchain activity detected. Elevated cortisol risk during volatile sessions."
+            : txCount > 50
+            ? "Moderate onchain activity. Healthy transaction intervals observed."
+            : "Low transaction frequency. Minimal stress-pattern correlation detected.";
+
+        resultBox.innerHTML = `
+            <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:1rem; letter-spacing:0.08em; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">
+                INVESTIGATOR RESULT PREVIEW — <span style="color:var(--accent-green);">${address.slice(0,8)}...${address.slice(-6)}</span>
+            </span>
+
+            <!-- Summary row -->
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; margin-bottom:1.25rem;">
+                <div style="border:1px solid rgba(0,255,102,0.15); padding:0.75rem; background:rgba(0,255,102,0.03);">
+                    <div style="font-size:0.6rem; color:var(--text-muted); margin-bottom:0.3rem;">ETH BALANCE</div>
+                    <div style="font-size:1rem; font-weight:700; color:var(--accent-green); font-family:var(--font-mono);">${ethBalance}</div>
+                    <div style="font-size:0.65rem; color:var(--text-muted);">${ethUsd}</div>
+                </div>
+                <div style="border:1px solid rgba(255,255,255,0.08); padding:0.75rem; background:rgba(0,0,0,0.1);">
+                    <div style="font-size:0.6rem; color:var(--text-muted); margin-bottom:0.3rem;">TOTAL TXNs</div>
+                    <div style="font-size:1rem; font-weight:700; font-family:var(--font-mono);">${txCount.toLocaleString()}</div>
+                    <div style="font-size:0.65rem; color:var(--accent-green);">${activityLevel}</div>
+                </div>
+                <div style="border:1px solid rgba(139,92,246,0.15); padding:0.75rem; background:rgba(139,92,246,0.03);">
+                    <div style="font-size:0.6rem; color:var(--text-muted); margin-bottom:0.3rem;">TOKENS HELD</div>
+                    <div style="font-size:1rem; font-weight:700; color:#8B5CF6; font-family:var(--font-mono);">${tokenCount}</div>
+                    <div style="font-size:0.65rem; color:var(--text-muted);">ERC-20</div>
+                </div>
+                <div style="border:1px solid rgba(255,255,255,0.08); padding:0.75rem; background:rgba(0,0,0,0.1);">
+                    <div style="font-size:0.6rem; color:var(--text-muted); margin-bottom:0.3rem;">CONTRACT</div>
+                    <div style="font-size:0.75rem; font-weight:700; font-family:var(--font-mono); color:${data.address?.isContract ? '#F59E0B' : 'var(--accent-green)'};">${isContract}</div>
+                </div>
+            </div>
+
+            <!-- Token holdings -->
+            <div style="margin-bottom:1rem;">
+                <div style="font-size:0.7rem; color:var(--accent-green); margin-bottom:0.5rem; font-family:var(--font-mono);">TOP TOKEN HOLDINGS</div>
+                <div style="overflow-x:auto;">
+                    <table style="width:100%; font-size:0.75rem; border-collapse:collapse; font-family:var(--font-mono);">
+                        <thead>
+                            <tr style="color:var(--text-muted); border-bottom:1px solid var(--border-color);">
+                                <th style="padding:0.3rem 0.4rem; text-align:left;">SYMBOL</th>
+                                <th style="padding:0.3rem 0.4rem; text-align:left;">NAME</th>
+                                <th style="padding:0.3rem 0.4rem; text-align:left;">BALANCE</th>
+                                <th style="padding:0.3rem 0.4rem; text-align:left;">USD VALUE</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tokenRows}</tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Biometric correlation -->
+            <div style="border:1px solid rgba(139,92,246,0.2); padding:0.75rem; background:rgba(139,92,246,0.04);">
+                <div style="font-size:0.65rem; color:#8B5CF6; margin-bottom:0.4rem; font-family:var(--font-mono);">⬡ VALERIA BIO-CORRELATION INDEX</div>
+                <div style="font-size:0.78rem; color:var(--text-muted); line-height:1.6;">${biometricNote}</div>
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.6rem;">
+                    <div style="font-size:0.65rem; color:var(--text-muted); font-family:var(--font-mono);">ACTIVITY RISK SCORE:</div>
+                    <div style="flex:1; height:4px; background:rgba(255,255,255,0.06); border-radius:2px;">
+                        <div style="height:100%; width:${Math.min(100, riskScore)}%; background:${riskScore > 70 ? '#EF4444' : riskScore > 40 ? '#F59E0B' : '#00FF66'}; border-radius:2px;"></div>
+                    </div>
+                    <div style="font-size:0.65rem; color:var(--accent-green); font-family:var(--font-mono);">${riskScore}/100</div>
+                </div>
+            </div>
+
+            <div style="font-size:0.6rem; color:var(--text-muted); margin-top:0.75rem; font-family:var(--font-mono);">
+                ⟳ Data via Ethplorer API • Ethereum Mainnet • Updated: ${new Date().toTimeString().split(" ")[0]}
+            </div>`;
+
+    } catch (err) {
+        resultBox.innerHTML = renderWalletError(`Network error: ${err.message}`);
+    }
+}
+
+function renderWalletError(msg) {
+    return `
+        <span style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:0.5rem; letter-spacing:0.08em;">INVESTIGATOR RESULT PREVIEW</span>
+        <div style="color:#EF4444; font-family:var(--font-mono); font-size:0.82rem; padding:0.5rem 0;">
+            ✕ ${escapeHtml(msg)}
+        </div>`;
 }
 
 /* ==========================================================================

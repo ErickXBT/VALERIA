@@ -1,6 +1,6 @@
 /*
   VALERIA OS — Express Backend
-  Serves static files + AI chat API endpoints (streaming SSE)
+  Serves static files + AI chat API endpoints (streaming SSE via Google Gemini)
 */
 
 const express = require("express");
@@ -14,8 +14,55 @@ app.use(express.static(path.join(__dirname)));
 
 // ─── Status endpoint ───────────────────────────────────────────────────────
 app.get("/api/status", (req, res) => {
-  res.json({ status: "online", aiEnabled: !!process.env.OPENAI_API_KEY });
+  res.json({ status: "online", aiEnabled: !!process.env.GEMINI_API_KEY });
 });
+
+// ─── Gemini streaming helper ───────────────────────────────────────────────
+async function streamGemini(res, systemPrompt, messages) {
+  const { GoogleGenerativeAI } = require("@google/generative-ai");
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-3.5-flash",
+    systemInstruction: systemPrompt,
+  });
+
+  // Convert messages to Gemini format (roles: user / model)
+  const history = messages.slice(0, -1).map(m => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+  const lastMsg = messages[messages.length - 1].content;
+
+  const chat = model.startChat({ history });
+  const result = await chat.sendMessageStream(lastMsg);
+
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+
+  for await (const chunk of result.stream) {
+    const text = chunk.text();
+    if (text) {
+      res.write(`data: ${JSON.stringify({ token: text })}\n\n`);
+    }
+  }
+  res.write("data: [DONE]\n\n");
+  res.end();
+}
+
+// ─── Gemini JSON helper (non-streaming) ───────────────────────────────────
+async function callGeminiJSON(systemPrompt, userMessage) {
+  const { GoogleGenerativeAI } = require("@google/generative-ai");
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-3.5-flash",
+    systemInstruction: systemPrompt,
+    generationConfig: { responseMimeType: "application/json" },
+  });
+  const result = await model.generateContent(userMessage);
+  return result.response.text();
+}
 
 // ─── Main Valeria chat (SSE streaming) ─────────────────────────────────────
 app.post("/api/chat", async (req, res) => {
@@ -23,13 +70,9 @@ app.post("/api/chat", async (req, res) => {
   if (!messages || !Array.isArray(messages)) {
     return res.status(400).json({ error: "messages array required" });
   }
-
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(503).json({ error: "AI not configured — OPENAI_API_KEY missing" });
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(503).json({ error: "AI not configured — GEMINI_API_KEY missing" });
   }
-
-  const OpenAI = require("openai");
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   const systemPrompt = `You are Valeria, an advanced AI operating system built for Robinhood Chain (EVM chain ID 4663). You are a cyberpunk healthcare and onchain intelligence agent.
 
@@ -50,29 +93,10 @@ Always stay in character as Valeria OS. Keep responses concise but insightful. U
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    const stream = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "system", content: systemPrompt }, ...messages],
-      stream: true,
-      max_tokens: 800,
-      temperature: 0.7,
-    });
-
-    for await (const chunk of stream) {
-      const delta = chunk.choices[0]?.delta?.content || "";
-      if (delta) {
-        res.write(`data: ${JSON.stringify({ token: delta })}\n\n`);
-      }
-    }
-
-    res.write("data: [DONE]\n\n");
-    res.end();
+    await streamGemini(res, systemPrompt, messages);
   } catch (err) {
     console.error("Chat API error:", err.message);
-    const errMsg = err.status === 429
-      ? "OpenAI quota exceeded. Please add billing at platform.openai.com/settings/billing"
-      : `AI error: ${err.message}`;
-    res.write(`data: ${JSON.stringify({ error: errMsg })}\n\n`);
+    res.write(`data: ${JSON.stringify({ error: `AI error: ${err.message}` })}\n\n`);
     res.write("data: [DONE]\n\n");
     res.end();
   }
@@ -82,12 +106,9 @@ Always stay in character as Valeria OS. Keep responses concise but insightful. U
 app.post("/api/health-chat", async (req, res) => {
   const { messages, metrics, jsonMode } = req.body;
 
-  if (!process.env.OPENAI_API_KEY) {
-    return res.status(503).json({ error: "AI not configured" });
+  if (!process.env.GEMINI_API_KEY) {
+    return res.status(503).json({ error: "AI not configured — GEMINI_API_KEY missing" });
   }
-
-  const OpenAI = require("openai");
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
   const metricsContext = metrics ? `
 Current live biometric data:
@@ -109,26 +130,24 @@ Your role:
 - Correlate glucose, HRV, sleep, and cortisol with lifestyle recommendations
 - Give actionable, personalized health protocols
 - Speak with clinical precision but remain approachable
-- Use ** for bold key terms, - for bullet points
+- Use ** for bold key terms, - for bullet points`;
 
-${jsonMode ? `IMPORTANT: Respond ONLY with valid JSON in this exact format:
+  if (jsonMode) {
+    const jsonSystemPrompt = systemPrompt + `
+
+IMPORTANT: Respond ONLY with valid JSON in this exact format:
 {
   "insights": ["insight 1", "insight 2", "insight 3"],
   "actionPlan": ["action 1", "action 2", "action 3"],
   "overallAssessment": "one sentence summary",
-  "riskFlags": ["flag 1"] 
-}` : ""}`;
-
-  if (jsonMode) {
+  "riskFlags": []
+}`;
     try {
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{ role: "system", content: systemPrompt }, ...(messages || [{ role: "user", content: "Analyze my current biometrics and provide insights." }])],
-        response_format: { type: "json_object" },
-        max_tokens: 600,
-        temperature: 0.5,
-      });
-      return res.json(JSON.parse(completion.choices[0].message.content));
+      const userMsg = (messages && messages.length)
+        ? messages[messages.length - 1].content
+        : "Analyze my current biometrics and provide insights.";
+      const raw = await callGeminiJSON(jsonSystemPrompt, userMsg);
+      return res.json(JSON.parse(raw));
     } catch (err) {
       console.error("Health chat JSON error:", err.message);
       return res.status(500).json({ error: err.message });
@@ -142,29 +161,10 @@ ${jsonMode ? `IMPORTANT: Respond ONLY with valid JSON in this exact format:
   res.setHeader("Access-Control-Allow-Origin", "*");
 
   try {
-    const stream = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "system", content: systemPrompt }, ...messages],
-      stream: true,
-      max_tokens: 700,
-      temperature: 0.6,
-    });
-
-    for await (const chunk of stream) {
-      const delta = chunk.choices[0]?.delta?.content || "";
-      if (delta) {
-        res.write(`data: ${JSON.stringify({ token: delta })}\n\n`);
-      }
-    }
-
-    res.write("data: [DONE]\n\n");
-    res.end();
+    await streamGemini(res, systemPrompt, messages && messages.length ? messages : [{ role: "user", content: "Hello" }]);
   } catch (err) {
     console.error("Health chat stream error:", err.message);
-    const errMsg = err.status === 429
-      ? "OpenAI quota exceeded — add billing at platform.openai.com/settings/billing"
-      : `AI error: ${err.message}`;
-    res.write(`data: ${JSON.stringify({ error: errMsg })}\n\n`);
+    res.write(`data: ${JSON.stringify({ error: `AI error: ${err.message}` })}\n\n`);
     res.write("data: [DONE]\n\n");
     res.end();
   }
@@ -172,5 +172,5 @@ ${jsonMode ? `IMPORTANT: Respond ONLY with valid JSON in this exact format:
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`ValeriaOS server running on port ${PORT}`);
-  console.log(`AI enabled: ${!!process.env.OPENAI_API_KEY}`);
+  console.log(`AI enabled: ${!!process.env.GEMINI_API_KEY}`);
 });
